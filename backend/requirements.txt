@@ -16,3 +16,19 @@ psycopg2==2.9.4
 
 
 django-environ==0.12.0
+
+
+pillow==11.1.0
+
+
+django-ckeditor==6.7.2
+
+
+celery==5.4.0
+
+django-celery-results==2.5.1
+
+django-celery-beat==2.7.0
+
+
+djangorestframework-api-response==0.1.0

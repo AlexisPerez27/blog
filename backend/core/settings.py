@@ -28,6 +28,7 @@ environ.Env.read_env()
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
+VALID_API_KEY= env.str("VALID_API_KEY").split(",")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -52,10 +53,20 @@ PROJECT_APPS = [
 
 THIRD_PARTY_APPS = [
     'rest_framework',
-    'channels'
+    'rest_framework_api',
+    'channels',
+    'ckeditor',
+    'ckeditor_uploader',
+    'django_celery_results',
+    'django_celery_beat',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
+
+
+CKEDITOR_CONFIGS = {"default": {"toolbar":"full", "autoParagraph": False}}
+
+CKEDITOR_UPLOAD_PATH = "media/"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -143,6 +154,10 @@ STATIC_LOCATION = "static"
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR,"static")
 
+# para guaradar los archivos
+MEDIA_URL = 'media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -152,7 +167,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticatedOrReadOnly"
+        "rest_framework.permissions.AllowAny" #IsAuthenticatedOrReadOnly
     ]
 }
 
@@ -165,6 +180,9 @@ CHANNELS_LAYERS = {
         }
     }
 }
+
+
+REDIS_HOST = env("REDIS_HOST")
 
 CACHES = {
     "default": {
@@ -180,3 +198,32 @@ CACHES = {
 
 
 CHANNELS_ALLOWED_ORIGINS = "http://localhost:3000"
+
+
+
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "America/Mexico_City"
+
+CELERY_BROKER_URL = env("REDIS_URL")
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    'visibility_timeout': 3600,
+    'socet_timeout': 5,
+    'retry_on_timeout': True
+}
+
+
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND =  'default'
+
+CELERY_IMPORTS = (
+    'core.task',
+    'apps.blog.task'
+)
+
+
+
+
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+CELERY_BEAT_SCHEDULE = {}
